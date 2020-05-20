@@ -5,6 +5,7 @@ import { SchoolsModule } from './modules/schools/schools.module';
 import { Course } from './modules/courses/entities/course.entity';
 import { School } from './modules/schools/entities/school.entity';
 
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
