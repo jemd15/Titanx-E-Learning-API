@@ -14,9 +14,10 @@ import { School } from './modules/schools/entities/school.entity';
       "port": 3306,
       "username": "root",
       "password": "",
-      "database": "test",
+      "database": "titanxcl_e_learning",
       "entities": [Course, School],
-      "synchronize": true
+      "synchronize": true,
+      "retryAttempts": 0
     }),
     CoursesModule,
     SchoolsModule

@@ -11,7 +11,7 @@ export class SchoolsController {
 
 
   @Get()
-  async finAllSchools(): Promise<School> {
+  async finAllSchools(): Promise<School[]> {
     return await this.schoolsService.finAllSchools();
   }
 

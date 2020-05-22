@@ -9,12 +9,12 @@ export class SchoolsService {
     private schoolsRepository: SchoolsRepository
   ){}
 
-  finAllSchools(): Promise<School> {
+  finAllSchools(): Promise<School[]> {
     return this.schoolsRepository.find();
   }
 
-  findSchoolById(schoolId: string): Promise<School> {
-    return this.schoolsRepository.findOne(schoolId);
+  findSchoolById(school_id: string): Promise<School> {
+    return this.schoolsRepository.findOne(school_id);
   }
 
 }

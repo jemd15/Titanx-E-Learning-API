@@ -1,24 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, Column, Timestamp, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
-@Entity({ name: 'courses' })
+@Entity({ name: 'course' })
 export class Course {
 
-  @PrimaryGeneratedColumn({ name: 'idCourses' })
-  courseId: number;
+  @PrimaryGeneratedColumn({ name: 'course_id' })
+  course_id: number;
 
-  @Column({ name: 'name', length: 255 })
+  @Column({ name: 'name' })
   name: string;
 
-  @Column({ name: 'imgUrl', length: 255 })
-  imgUrl: string;
+  @Column({ name: 'img_url' })
+  img_url: string;
 
-  @Column({ name: 'school', length: 255 })
-  school: string;
+  @Column({ name: 'school_id' })
+  school_id: number;
 
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Timestamp;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updated_at: Timestamp;
+  @Column({ name: 'teacher_id' })
+  teacher_id: number;
 
 }
