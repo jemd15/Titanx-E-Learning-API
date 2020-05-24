@@ -15,10 +15,13 @@ import { StudentHasCourse } from './modules/schools/entities/StudentHasCourse';
 import { User } from './modules/users/entities/User';
 import { Teacher } from './modules/users/entities/Teacher';
 import { Student } from './modules/users/entities/Student';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { MorganModule, MorganInterceptor } from 'nest-morgan';
 
 
 @Module({
   imports: [
+    MorganModule.forRoot(),
     TypeOrmModule.forRoot({
       "type": "mariadb",
       "host": "localhost",
@@ -40,14 +43,18 @@ import { Student } from './modules/users/entities/Student';
         Teacher,
         Student
       ],
-      "synchronize": true,
-      "retryAttempts": 0
+      "synchronize": true
     }),
     CoursesModule,
     SchoolsModule,
     UsersModule
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MorganInterceptor('combined'),
+    }
+  ],
 })
 export class AppModule { }

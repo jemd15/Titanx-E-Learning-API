@@ -5,14 +5,14 @@ import { Teacher } from "../../users/entities/Teacher";
 @Entity("school", { schema: "titanxcl_e_learning" })
 export class School {
   @PrimaryGeneratedColumn({ type: "int", name: "school_id" })
-  public schoolId: number;
+  schoolId: number;
 
   @Column("varchar", { name: "name", length: 45 })
-  public name: string;
+  name: string;
 
   @OneToMany(() => Student, (student) => student.schoolSchool)
-  public students: Student[];
+  students: Student[];
 
   @OneToMany(() => Teacher, (teacher) => teacher.schoolSchool)
-  public teachers: Teacher[];
+  teachers: Teacher[];
 }

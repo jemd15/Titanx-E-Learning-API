@@ -6,7 +6,6 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  RelationId,
 } from "typeorm";
 import { School } from "../../schools/entities/School";
 import { User } from "./User";
@@ -18,37 +17,31 @@ import { StudentHasCourse } from "../../schools/entities/StudentHasCourse";
 @Entity("student", { schema: "titanxcl_e_learning" })
 export class Student {
   @PrimaryGeneratedColumn({ type: "int", name: "student_id" })
-  public studentId: number;
+  studentId: number;
 
   @Column("int", { primary: true, name: "user_user_id" })
-  public userUserId: number;
+  userUserId: number;
 
   @Column("int", { primary: true, name: "school_school_id" })
-  public schoolSchoolId: number;
+  schoolSchoolId: number;
 
   @ManyToOne(() => School, (school) => school.students, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "school_school_id", referencedColumnName: "schoolId" }])
-  public schoolSchool: School;
+  schoolSchool: School;
 
   @ManyToOne(() => User, (user) => user.students, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
   @JoinColumn([{ name: "user_user_id", referencedColumnName: "userId" }])
-  public userUser: User;
+  userUser: User;
 
   @OneToMany(
     () => StudentHasCourse,
     (studentHasCourse) => studentHasCourse.student
   )
-  public studentHasCourses: StudentHasCourse[];
-
-  @RelationId((student: Student) => student.schoolSchool)
-  public schoolSchoolId2: number[];
-
-  @RelationId((student: Student) => student.userUser)
-  public userUserId2: number[];
+  studentHasCourses: StudentHasCourse[];
 }

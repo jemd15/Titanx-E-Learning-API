@@ -1,13 +1,6 @@
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  RelationId,
-} from "typeorm";
-import { Course } from "../../courses/entities/Course";
+import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import { Student } from "../../users/entities/Student";
+import { Course } from "../../courses/entities/Course";
 
 @Index("fk_student_has_course_course1_idx", ["courseCourseId"], {})
 @Index(
@@ -18,23 +11,16 @@ import { Student } from "../../users/entities/Student";
 @Entity("student_has_course", { schema: "titanxcl_e_learning" })
 export class StudentHasCourse {
   @Column("int", { primary: true, name: "student_student_id" })
-  public studentStudentId: number;
+  studentStudentId: number;
 
   @Column("int", { primary: true, name: "student_user_user_id" })
-  public studentUserUserId: number;
+  studentUserUserId: number;
 
   @Column("int", { primary: true, name: "student_school_school_id" })
-  public studentSchoolSchoolId: number;
+  studentSchoolSchoolId: number;
 
   @Column("int", { primary: true, name: "course_course_id" })
-  public courseCourseId: number;
-
-  @ManyToOne(() => Course, (course) => course.studentHasCourses, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "course_course_id", referencedColumnName: "courseId" }])
-  public courseCourse: Course;
+  courseCourseId: number;
 
   @ManyToOne(() => Student, (student) => student.studentHasCourses, {
     onDelete: "NO ACTION",
@@ -48,10 +34,12 @@ export class StudentHasCourse {
       referencedColumnName: "schoolSchoolId",
     },
   ])
-  public student: Student;
+  student: Student;
 
-  @RelationId(
-    (studentHasCourse: StudentHasCourse) => studentHasCourse.courseCourse
-  )
-  public courseCourseId2: number[];
+  @ManyToOne(() => Course, (course) => course.studentHasCourses, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "course_course_id", referencedColumnName: "courseId" }])
+  courseCourse: Course;
 }

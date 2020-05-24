@@ -13,8 +13,11 @@ export class CoursesService {
     return this.coursesRepository.find();
   }
 
-  findCourseById(courseId: string): Promise<Course> {
-    return this.coursesRepository.findOne(courseId);
+  async findCourseById(courseId: number): Promise<Course> {
+    return await this.coursesRepository
+      .createQueryBuilder('course')
+      .where('course_id = :courseId', { courseId })
+      .getOne();
   }
 
 }
