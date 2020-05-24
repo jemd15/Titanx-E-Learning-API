@@ -4,8 +4,10 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Course } from "../../courses/entities/Course";
 import { School } from "../../schools/entities/School";
 import { User } from "./User";
 
@@ -22,6 +24,9 @@ export class Teacher {
 
   @Column("int", { primary: true, name: "school_school_id" })
   schoolSchoolId: number;
+
+  @OneToMany(() => Course, (course) => course.teacher)
+  courses: Course[];
 
   @ManyToOne(() => School, (school) => school.teachers, {
     onDelete: "NO ACTION",

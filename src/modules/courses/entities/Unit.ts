@@ -1,4 +1,14 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { Lesson } from "./Lesson";
+import { Course } from "./Course";
 
 @Index("unit_id_UNIQUE", ["unitId"], { unique: true })
 @Index("fk_unit_course1_idx", ["courseCourseId"], {})
@@ -21,4 +31,14 @@ export class Unit {
 
   @Column("int", { primary: true, name: "course_course_id" })
   courseCourseId: number;
+
+  @OneToMany(() => Lesson, (lesson) => lesson.unit)
+  lessons: Lesson[];
+
+  @ManyToOne(() => Course, (course) => course.units, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "course_course_id", referencedColumnName: "courseId" }])
+  courseCourse: Course;
 }

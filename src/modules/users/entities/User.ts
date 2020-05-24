@@ -10,7 +10,6 @@ import { Teacher } from "./Teacher";
 
 @Index("user_id_UNIQUE", ["userId"], { unique: true })
 @Index("email_UNIQUE", ["email"], { unique: true })
-@Index("IDX_e12875dfb3b1d92d7d7c5377e2", ["email"], { unique: true })
 @Entity("user", { schema: "titanxcl_e_learning" })
 export class User {
   @PrimaryGeneratedColumn({ type: "int", name: "user_id" })

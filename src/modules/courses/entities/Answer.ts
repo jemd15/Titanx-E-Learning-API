@@ -1,4 +1,12 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { Question } from "./Question";
 
 @Index("answer_id_UNIQUE", ["answerId"], { unique: true })
 @Index(
@@ -37,4 +45,26 @@ export class Answer {
     name: "question_test_lesson_unit_course_course_id",
   })
   questionTestLessonUnitCourseCourseId: number;
+
+  @ManyToOne(() => Question, (question) => question.answers, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([
+    { name: "question_question_id", referencedColumnName: "questionId" },
+    { name: "question_test_test_id", referencedColumnName: "testTestId" },
+    {
+      name: "question_test_lesson_lesson_id",
+      referencedColumnName: "testLessonLessonId",
+    },
+    {
+      name: "question_test_lesson_unit_unit_id",
+      referencedColumnName: "testLessonUnitUnitId",
+    },
+    {
+      name: "question_test_lesson_unit_course_course_id",
+      referencedColumnName: "testLessonUnitCourseCourseId",
+    },
+  ])
+  question: Question;
 }

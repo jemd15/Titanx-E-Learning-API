@@ -20,4 +20,8 @@ export class CoursesService {
       .getOne();
   }
 
+  async createCourse(course): Promise<Course> {
+    return await this.coursesRepository.save(course);
+  }
+
 }

@@ -17,4 +17,8 @@ export class SchoolsService {
     return this.schoolsRepository.findOne(school_id);
   }
 
+  async createSchool(school): Promise<School> {
+    return await this.schoolsRepository.save(school);
+  }
+
 }

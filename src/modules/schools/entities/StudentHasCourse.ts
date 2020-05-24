@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Student } from "../../users/entities/Student";
 import { Course } from "../../courses/entities/Course";
+import { Student } from "../../users/entities/Student";
 
 @Index("fk_student_has_course_course1_idx", ["courseCourseId"], {})
 @Index(
@@ -22,6 +22,13 @@ export class StudentHasCourse {
   @Column("int", { primary: true, name: "course_course_id" })
   courseCourseId: number;
 
+  @ManyToOne(() => Course, (course) => course.studentHasCourses, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "course_course_id", referencedColumnName: "courseId" }])
+  courseCourse: Course;
+
   @ManyToOne(() => Student, (student) => student.studentHasCourses, {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
@@ -35,11 +42,4 @@ export class StudentHasCourse {
     },
   ])
   student: Student;
-
-  @ManyToOne(() => Course, (course) => course.studentHasCourses, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
-  })
-  @JoinColumn([{ name: "course_course_id", referencedColumnName: "courseId" }])
-  courseCourse: Course;
 }
