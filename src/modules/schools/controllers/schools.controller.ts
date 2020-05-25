@@ -14,12 +14,12 @@ export class SchoolsController {
   @UseInterceptors(MorganInterceptor('combined'))
   @Get()
   async finAllSchools(): Promise<School[]> {
-    return await this.schoolsService.finAllSchools();
+    return await this.schoolsService.findAllSchools();
   }
 
   @UseInterceptors(MorganInterceptor('combined'))
   @Get('/:schoolId')
-  async getCourseById(@Param('schoolId') schoolId: string): Promise<School> {
+  async getCourseById(@Param('schoolId') schoolId: number): Promise<School> {
     return await this.schoolsService.findSchoolById(schoolId);
   }
 

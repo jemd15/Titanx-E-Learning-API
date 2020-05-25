@@ -9,15 +9,15 @@ export class SchoolsService {
     private schoolsRepository: SchoolsRepository
   ){}
 
-  finAllSchools(): Promise<School[]> {
+  findAllSchools(): Promise<School[]> {
     return this.schoolsRepository.find();
   }
 
-  findSchoolById(school_id: string): Promise<School> {
+  findSchoolById(school_id: number): Promise<School> {
     return this.schoolsRepository.findOne(school_id);
   }
 
-  async createSchool(school): Promise<School> {
+  async createSchool(school: Partial<School>): Promise<School> {
     return await this.schoolsRepository.save(school);
   }
 
