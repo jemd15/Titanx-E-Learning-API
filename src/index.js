@@ -17,17 +17,18 @@ app.use(express.json());
 app.use((req, res, next) => {
   // esta función tendrá sentido más adelante
   next();
-})
+});
 
 // routes
-app.use('/courses', require('./routes/courses'));
-app.use('/schools', require('./routes/schools'));
-app.use('/users', require('./routes/users'));
+app.use('/auth', require('./routes/auth.routes'));
+app.use('/courses', require('./routes/courses.routes'));
+app.use('/schools', require('./routes/schools.routes'));
+app.use('/users', require('./routes/users.routes'));
 
 // public
 app.use(express.static(path.join(__dirname, 'public')));
 
 // starting the server
 app.listen(app.get('port'), () => {
-  console.log('server on port', app.get('port'));
+  console.log('Server on port', app.get('port'));
 })
