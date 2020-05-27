@@ -1,4 +1,5 @@
 const express = require('express');
+var cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
 
@@ -10,12 +11,14 @@ app.set('port', process.env.port || 3000);
 
 // middlewares
 app.use(morgan('dev'));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// global variables
+// Headers
 app.use((req, res, next) => {
-  // esta función tendrá sentido más adelante
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS, POST, PUT");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   next();
 });
 
@@ -31,4 +34,4 @@ app.use(express.static(path.join(__dirname, 'public')));
 // starting the server
 app.listen(app.get('port'), () => {
   console.log('Server on port', app.get('port'));
-})
+});

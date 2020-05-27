@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const coursesModel = require('../models/courses.models');
+const verifyRole = require('../lib/verifyRole');
 
 // get courses
 router.get('/', (req, res) => {
+  console.log('headers', req.token);
+  // verifyRole.getRequesterId(req);
   coursesModel.getCourses()
     .then(courses => {
       res.status(200).json({

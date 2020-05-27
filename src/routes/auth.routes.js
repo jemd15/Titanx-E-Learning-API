@@ -15,16 +15,24 @@ router.post('/login', (req, res) => {
   }
 
   authModel.getUserByEmail(login.email)
-    .then(user => {
-      helpers.matchPassword(`${login.password}`, `${user.password}`) // buscar la manera correcta de àrsear esas variables a string
-        .then((response) => {
-          console.log('asdasdasd', response);
-          const token = jwt.sign({ user }, 'jwt-secret'); // cambiar por secret variable de entorno
-          res.status(200).json({
-            success: true,
-            message: 'Loggin success.',
-            token
-          });
+    .then(userFound => {
+      helpers.matchPassword(login.password, userFound[0].password)
+        .then((success) => {
+          if(success){
+            const token = jwt.sign({ userFound }, 'jwt-secret'); // cambiar por secret variable de entorno
+            userFound[0].token = token;
+            delete userFound[0]['password'];
+            res.status(200).json({
+              success: true,
+              message: 'Loggin success.',
+              user: userFound[0]
+            });
+          }else {
+            res.status(401).json({
+              success: false,
+              message: 'Password wrong.'
+            });
+          }
         })
         .catch(err => {
           console.error(err)

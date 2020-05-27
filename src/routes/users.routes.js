@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const usersModel = require('../models/users.models');
 const helpers = require('../lib/helpers');
+const verifyRole = require('../lib/verifyRole');
 
 // get users
-router.get('/', (req, res) => {
+router.get('/', verifyRole.admin, (req, res) => {
   usersModel.getUsers()
     .then(users => {
       users.forEach(user => {
@@ -22,10 +23,10 @@ router.get('/', (req, res) => {
         message: err.message
       });
     });
-})
+});
 
 // get teachers
-router.get('/teachers', (req, res) => {
+router.get('/teachers', verifyRole.admin, (req, res) => {
   usersModel.getTeachers()
     .then(teachers => {
       teachers.forEach(teacher => {
@@ -43,10 +44,10 @@ router.get('/teachers', (req, res) => {
         message: err.message
       });
     });
-})
+});
 
 // get students
-router.get('/students', (req, res) => {
+router.get('/students', verifyRole.teacher, (req, res) => {
   usersModel.getStudents()
     .then(students => {
       students.forEach(student => {
@@ -64,10 +65,10 @@ router.get('/students', (req, res) => {
         message: err.message
       });
     });
-})
+});
 
 // get admins
-router.get('/admins', (req, res) => {
+router.get('/admins', verifyRole.admin, (req, res) => {
   usersModel.getAdmins()
     .then(admins => {
       admins.forEach(admin => {
@@ -85,7 +86,7 @@ router.get('/admins', (req, res) => {
         message: err.message
       });
     });
-})
+});
 
 // create user
 router.post('/new', async (req, res) => {
