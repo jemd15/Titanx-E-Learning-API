@@ -2,8 +2,14 @@ const pool = require('../database');
 
 let coursesModel = {};
 
-coursesModel.getCourses = () => {
-  return pool.query('SELECT * FROM course');
+coursesModel.getCourses = (requester_id, requester_role) => {
+  if(requester_role == 'student'){
+    return pool.query("SELECT courseData.course_id, courseData.school_id, courseData.course, courseData.teacher, courseData.img_url FROM (SELECT course.course_id, course.school_id, course.name as course, concat(user.name, ' ', user.lastName) as teachecourse.img_url FROM course  INNER JOIN teacher  ON course.teacher_teacher_id=teacher.teacher_id  INNER JOIN user ON teacher.user_user_id=user.user_id) as courseData INNER JOIN course_has_student ON courseData.course_id=course_has_student.course_course_id INNER JOIN student ON course_has_student.student_student_id=student_id INNER JOIN user ON student.user_user_id=user.user_id WHERE student.user_user_id=?;", [requester_id]);
+  } else if (requester_role == 'teacher') {
+    return pool.query("SELECT course.course_id, course.school_id, course.name as course, concat(user.name, ' ', user.lastName) as teacher, course.img_url FROM course INNER JOIN teacher ON course.teacher_teacher_id=teacher.teacher_id INNER JOIN user on teacher.user_user_id=user.user_id WHERE user.user_id=?", [requester_id]);
+  } else if (requester_role == 'admin') {
+    return pool.query("SELECT course.course_id, course.school_id, course.name as course, concat(user.name, ' ', user.lastName) as teacher, course.img_url FROM course INNER JOIN teacher ON course.teacher_teacher_id=teacher.teacher_id INNER JOIN user on teacher.user_user_id=user.user_id", [requester_id]);
+  }
 }
 
 coursesModel.createCourse = (newCourse) => {

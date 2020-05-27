@@ -4,10 +4,8 @@ const coursesModel = require('../models/courses.models');
 const verifyRole = require('../lib/verifyRole');
 
 // get courses
-router.get('/', (req, res) => {
-  console.log('headers', req.token);
-  // verifyRole.getRequesterId(req);
-  coursesModel.getCourses()
+router.get('/', verifyRole.student, (req, res) => {
+  coursesModel.getCourses(req.requester_id, req.requester_role)
     .then(courses => {
       res.status(200).json({
         success: true,
@@ -24,7 +22,7 @@ router.get('/', (req, res) => {
 });
 
 // get course by id
-router.get('/:course_id', (req, res) => {
+router.get('/:course_id', verifyRole.student, (req, res) => {
   coursesModel.getCourseById(req.params.course_id)
     .then(course => {
       res.status(200).json({
@@ -42,7 +40,7 @@ router.get('/:course_id', (req, res) => {
 });
 
 // create course
-router.post('/new', (req, res) => {
+router.post('/new', verifyRole.teacher, (req, res) => {
   const { school_id, name, img_url, teacher_teacher_id, teacher_user_user_id, teacher_school_school_id } = req.body;
   const course = {
     school_id, name, img_url, teacher_teacher_id, teacher_user_user_id, teacher_school_school_id
@@ -66,7 +64,7 @@ router.post('/new', (req, res) => {
 });
 
 // get units
-router.get('/:course_id/units', (req, res) => {
+router.get('/:course_id/units', verifyRole.student, (req, res) => {
   coursesModel.getUnitsByCourseId(req.params.course_id)
     .then(units => {
       res.status(200).json({
@@ -84,7 +82,7 @@ router.get('/:course_id/units', (req, res) => {
 });
 
 // get unit by id
-router.get('/:course_id/units/:unit_id', (req, res) => {
+router.get('/:course_id/units/:unit_id', verifyRole.student, (req, res) => {
   coursesModel.getUnitById(req.params.unit_id)
     .then(unit => {
       res.status(200).json({
@@ -102,7 +100,7 @@ router.get('/:course_id/units/:unit_id', (req, res) => {
 });
 
 // create unit
-router.post('/:course_id/units/new', (req, res) => {
+router.post('/:course_id/units/new', verifyRole.teacher, (req, res) => {
   const { number, title, description, state, course_course_id } = req.body;
   const unit = {
     number, title, description, state, course_course_id
@@ -126,7 +124,7 @@ router.post('/:course_id/units/new', (req, res) => {
 });
 
 // get lessons
-router.get('/:course_id/units/:unit_id/lessons', (req, res) => { 
+router.get('/:course_id/units/:unit_id/lessons', verifyRole.student, (req, res) => { 
   coursesModel.getLessonsByUnitId(req.params.unit_id)
     .then(lessons => {
       res.status(200).json({
@@ -144,7 +142,7 @@ router.get('/:course_id/units/:unit_id/lessons', (req, res) => {
 });
 
 // get lesson by id
-router.get('/:course_id/units/:unit_id/lessons/:lesson_id', (req, res) => {
+router.get('/:course_id/units/:unit_id/lessons/:lesson_id', verifyRole.student, (req, res) => {
   coursesModel.getLessonById(req.params.lesson_id)
     .then(lesson => {
       res.status(200).json({
@@ -162,7 +160,7 @@ router.get('/:course_id/units/:unit_id/lessons/:lesson_id', (req, res) => {
 });
 
 // create lesson
-router.post('/:course_id/units/:unit_id/lessons/new', (req, res) => {
+router.post('/:course_id/units/:unit_id/lessons/new', verifyRole.teacher, (req, res) => {
   const { number, description, unit_unit_id, unit_course_course_id } = req.body;
   const lesson = {
     number, description, unit_unit_id, unit_course_course_id
@@ -186,7 +184,7 @@ router.post('/:course_id/units/:unit_id/lessons/new', (req, res) => {
 });
 
 // get activitys
-router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys', (req, res) => {
+router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys', verifyRole.student, (req, res) => {
   coursesModel.getActivitysByLessonId(req.params.lesson_id)
     .then(activitys => {
       res.status(200).json({
@@ -204,7 +202,7 @@ router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys', (req, res)
 });
 
 // get activity by id
-router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys/:activity_id', (req, res) => {
+router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys/:activity_id', verifyRole.student, (req, res) => {
   coursesModel.getActivityById(req.params.activity_id)
     .then(activity => {
       res.status(200).json({
@@ -222,7 +220,7 @@ router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys/:activity_id
 });
 
 // create activity
-router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys/new', (req, res) => {
+router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys/new', verifyRole.teacher, (req, res) => {
   const { number, description, type, url, lesson_lesson_id, lesson_unit_unit_id, lesson_unit_course_course_id } = req.body;
   const activity = {
     number, description, type, url, lesson_lesson_id, lesson_unit_unit_id, lesson_unit_course_course_id
