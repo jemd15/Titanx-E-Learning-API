@@ -243,4 +243,22 @@ router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_id/activity/new'
     });
 });
 
+// get test by lesson_id
+router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_id/test', verifyRole.student, (req, res) => {
+  coursesModel.getTestByLessonId(req.params.course_id, req.params.lesson_number, req.params.lesson_number)
+    .then(test => {
+      res.status(200).json({
+        success:true,
+        message: `Test from lesson ${req.params.lesson_number} from unit ${req.params.unit_number} from course with id ${req.params.course_id}.`,
+        test
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        message: err.message
+      })
+    })
+});
+
 module.exports = router;

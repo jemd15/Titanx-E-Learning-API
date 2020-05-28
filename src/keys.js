@@ -1,7 +1,7 @@
 module.exports = {
 
   database: {
-    host: 'localhost',
+    host: 'titanx.cl',
     user: 'root',
     password: '',
     database: 'titanxcl_e_learning',

@@ -56,4 +56,8 @@ coursesModel.createActivity = (activity) => {
   return pool.query('INSERT INTO activity set ?', [activity]);
 }
 
+coursesModel.getTestByLessonId = (course_id, unit_number, lesson_number) => {
+  return pool.query('SELECT * FROM activity WHERE lesson_lesson_id = ?', [lesson_number]);
+}
+
 module.exports = coursesModel;
