@@ -1,11 +1,11 @@
 module.exports = {
 
   database: {
-    host: 'titanx.cl',
-    user: 'root',
-    password: '',
-    database: 'titanxcl_e_learning',
-    port: 3306
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE,
+    port: process.env.DATABASE_PORT
   }
 
 }
