@@ -4,7 +4,7 @@ const coursesModel = require('../models/courses.models');
 const verifyRole = require('../lib/verifyRole');
 
 // get courses
-router.get('/', verifyRole.student, (req, res) => {
+router.get('/courses', verifyRole.student, (req, res) => {
   coursesModel.getCourses(req.requester_id, req.requester_role)
     .then(courses => {
       res.status(200).json({
@@ -22,7 +22,7 @@ router.get('/', verifyRole.student, (req, res) => {
 });
 
 // get course by id
-router.get('/:course_id', verifyRole.student, (req, res) => {
+router.get('/course/:course_id', verifyRole.student, (req, res) => {
   coursesModel.getCourseById(req.params.course_id)
     .then(course => {
       res.status(200).json({
@@ -40,7 +40,7 @@ router.get('/:course_id', verifyRole.student, (req, res) => {
 });
 
 // create course
-router.post('/new', verifyRole.teacher, (req, res) => {
+router.post('/course/new', verifyRole.teacher, (req, res) => {
   const { school_id, name, img_url, teacher_teacher_id, teacher_user_user_id, teacher_school_school_id } = req.body;
   const course = {
     school_id, name, img_url, teacher_teacher_id, teacher_user_user_id, teacher_school_school_id
@@ -64,12 +64,12 @@ router.post('/new', verifyRole.teacher, (req, res) => {
 });
 
 // get units
-router.get('/:course_id/units', verifyRole.student, (req, res) => {
+router.get('/course/:course_id/units', verifyRole.student, (req, res) => {
   coursesModel.getUnitsByCourseId(req.params.course_id)
     .then(units => {
       res.status(200).json({
         success:true,
-        message: `all units from course with id ${req.params.course_id}.`,
+        message: `units from course with id ${req.params.course_id}.`,
         units
       });
     })
@@ -81,9 +81,9 @@ router.get('/:course_id/units', verifyRole.student, (req, res) => {
     });
 });
 
-// get unit by id
-router.get('/:course_id/units/:unit_id', verifyRole.student, (req, res) => {
-  coursesModel.getUnitById(req.params.unit_id)
+// get unit by course_id
+/* router.get('/course/:course_id/units/', verifyRole.student, (req, res) => {
+  coursesModel.getUnitByCourseId(req.params.unit_id)
     .then(unit => {
       res.status(200).json({
         success:true,
@@ -97,10 +97,10 @@ router.get('/:course_id/units/:unit_id', verifyRole.student, (req, res) => {
         message: `error on get unit with id ${req.params.unit_id}.`
       });
     });
-});
+}); */
 
 // create unit
-router.post('/:course_id/units/new', verifyRole.teacher, (req, res) => {
+router.post('/course/:course_id/unit/new', verifyRole.teacher, (req, res) => {
   const { number, title, description, state, course_course_id } = req.body;
   const unit = {
     number, title, description, state, course_course_id
@@ -124,7 +124,7 @@ router.post('/:course_id/units/new', verifyRole.teacher, (req, res) => {
 });
 
 // get lessons
-router.get('/:course_id/units/:unit_id/lessons', verifyRole.student, (req, res) => { 
+/* router.get('/units/lessons', verifyRole.student, (req, res) => { 
   coursesModel.getLessonsByUnitId(req.params.unit_id)
     .then(lessons => {
       res.status(200).json({
@@ -139,28 +139,28 @@ router.get('/:course_id/units/:unit_id/lessons', verifyRole.student, (req, res) 
         message: `error on get lessons from unit with id ${req.params.unit_id}.`
       });
     });
-});
+}); */
 
-// get lesson by id
-router.get('/:course_id/units/:unit_id/lessons/:lesson_id', verifyRole.student, (req, res) => {
-  coursesModel.getLessonById(req.params.lesson_id)
-    .then(lesson => {
+// get lesson by unit_id
+router.get('/unit/:unit_id/lessons', verifyRole.student, (req, res) => {
+  coursesModel.getLessonsByUnitId(req.params.unit_id)
+    .then(lessons => {
       res.status(200).json({
         success:true,
-        message: `lesson with id ${req.params.lesson_id}.`,
-        lesson
+        message: `lessons from unit with id ${req.params.unit_id}.`,
+        lessons
       });
     })
     .catch(err => {
       res.status(500).json({
         success:false,
-        message: `error on get lesson with id ${req.params.lesson_id}.`
+        message: `error on get lessons from unit with id ${req.params.unit_id}.`
       });
     });
 });
 
 // create lesson
-router.post('/:course_id/units/:unit_id/lessons/new', verifyRole.teacher, (req, res) => {
+router.post('/unit/:unit_id/lesson/new', verifyRole.teacher, (req, res) => {
   const { number, description, unit_unit_id, unit_course_course_id } = req.body;
   const lesson = {
     number, description, unit_unit_id, unit_course_course_id
@@ -183,44 +183,45 @@ router.post('/:course_id/units/:unit_id/lessons/new', verifyRole.teacher, (req, 
     });
 });
 
-// get activitys
-router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys', verifyRole.student, (req, res) => {
+// get activities
+router.get('/lesson/:lesson_id/activities', verifyRole.student, (req, res) => {
   coursesModel.getActivitysByLessonId(req.params.lesson_id)
-    .then(activitys => {
+    .then(activities => {
       res.status(200).json({
         success: true,
         message: `Activitys from lesson with id ${req.params.lesson_id}`,
-        activitys
+        activities
       });
     })
     .catch(err => {
       res.status(500).json({
         success: false,
-        message: `error on get activitys from lesson with id ${req.params.lesson_id}`
+        message: `error on get activities from lesson with id ${req.params.lesson_id}`
       });
     });
 });
 
-// get activity by id
-router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys/:activity_id', verifyRole.student, (req, res) => {
-  coursesModel.getActivityById(req.params.activity_id)
-    .then(activity => {
+// get activity by course_id, unit_number and lesson_number
+router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_number/activities', verifyRole.student, (req, res) => {
+  coursesModel.getActivityOfALesson(req.params.course_id, req.params.lesson_number, req.params.lesson_number)
+    .then(activities => {
+      console.log(activities)
       res.status(200).json({
         success:true,
-        message: `activity with id ${req.params.activity_id}.`,
-        activity
+        message: `activities from lesson ${req.params.lesson_number} from unit ${req.params.unit_number} from course with id ${req.params.course_id}.`,
+        activities
       });
     })
     .catch(err => {
       res.status(500).json({
         success:false,
-        message: `error on get activity with id ${req.params.activity_id}.`
+        message: `error on get activities.`
       });
     });
 });
 
 // create activity
-router.get('/:course_id/units/:unit_id/lessons/:lesson_id/activitys/new', verifyRole.teacher, (req, res) => {
+router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_id/activity/new', verifyRole.teacher, (req, res) => {
   const { number, description, type, url, lesson_lesson_id, lesson_unit_unit_id, lesson_unit_course_course_id } = req.body;
   const activity = {
     number, description, type, url, lesson_lesson_id, lesson_unit_unit_id, lesson_unit_course_course_id

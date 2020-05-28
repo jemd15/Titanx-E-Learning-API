@@ -24,9 +24,9 @@ app.use((req, res, next) => {
 
 // routes
 app.use('/auth', require('./routes/auth.routes'));
-app.use('/courses', require('./routes/courses.routes'));
 app.use('/schools', require('./routes/schools.routes'));
 app.use('/users', require('./routes/users.routes'));
+app.use(require('./routes/courses.routes'));
 
 // public
 app.use(express.static(path.join(__dirname, 'public')));

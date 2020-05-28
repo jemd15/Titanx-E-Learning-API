@@ -91,17 +91,17 @@ router.get('/admins', verifyRole.admin, (req, res) => {
 // create user
 router.post('/new', async (req, res) => {
   const {
-    name, lastName, email, password, rol
+    name, lastName, email, password, rol, school_school_id
   } = req.body;
   const user = {
-    name, lastName, email, password, rol
+    name, lastName, email, password, rol, school_school_id
   }
   user.password = await helpers.encyptPassword(user.password);
 
   usersModel.createUser(user)
     .then(newUser => {
       user.user_id = newUser.insertId
-      delete user['password'];
+      // delete user['password'];
       res.status(200).json({
         success: true,
         message: 'User created successfully.',
