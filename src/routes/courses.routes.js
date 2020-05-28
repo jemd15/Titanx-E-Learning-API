@@ -205,7 +205,6 @@ router.get('/lesson/:lesson_id/activities', verifyRole.student, (req, res) => {
 router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_number/activities', verifyRole.student, (req, res) => {
   coursesModel.getActivityOfALesson(req.params.course_id, req.params.lesson_number, req.params.lesson_number)
     .then(activities => {
-      console.log(activities)
       res.status(200).json({
         success:true,
         message: `activities from lesson ${req.params.lesson_number} from unit ${req.params.unit_number} from course with id ${req.params.course_id}.`,

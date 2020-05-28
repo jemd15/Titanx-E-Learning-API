@@ -45,7 +45,6 @@ coursesModel.createLesson = (lesson) => {
 }
 
 coursesModel.getActivityOfALesson = (course_id, unit_number, lesson_number) => {
-  console.log('query data', course_id, unit_number, lesson_number)
   return pool.query('SELECT activity.activity_id, activity.number, activity.title, activity. description, activity.type, activity.url FROM activity INNER JOIN lesson ON lesson.lesson_id=activity.lesson_lesson_id INNER JOIN unit ON unit.unit_id=lesson.unit_unit_id INNER JOIN course ON unit.course_course_id=course.course_id WHERE unit.number=? AND lesson.number=? AND course_id=?', [unit_number, lesson_number, course_id]);
 }
 
