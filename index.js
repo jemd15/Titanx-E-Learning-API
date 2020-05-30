@@ -23,10 +23,10 @@ app.use((req, res, next) => {
 });
 
 // routes
-app.use('/auth', require('./src/routes/auth.routes'));
-app.use('/schools', require('./src/routes/schools.routes'));
-app.use('/users', require('./src/routes/users.routes'));
-app.use(require('./src/routes/courses.routes'));
+app.use('/api/auth', require('./src/routes/auth.routes'));
+app.use('/api/schools', require('./src/routes/schools.routes'));
+app.use('/api/users', require('./src/routes/users.routes'));
+app.use('/api',require('./src/routes/courses.routes'));
 
 // public
 app.use(express.static(path.join(__dirname, 'public')));

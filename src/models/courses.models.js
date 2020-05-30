@@ -56,8 +56,17 @@ coursesModel.createActivity = (activity) => {
   return pool.query('INSERT INTO activity set ?', [activity]);
 }
 
-coursesModel.getTestByLessonId = (course_id, unit_number, lesson_number) => {
-  return pool.query('SELECT * FROM activity WHERE lesson_lesson_id = ?', [lesson_number]);
+coursesModel.getTestByCourseId = (course_id, unit_number, lesson_number) => {
+  return pool.query('SELECT test.* FROM test  INNER JOIN lesson  ON lesson.lesson_id=test.lesson_lesson_id INNER JOIN unit  ON unit.unit_id=lesson.unit_unit_id  INNER JOIN course  ON unit.course_course_id=course.course_id  WHERE unit.number=? AND lesson.number=? AND course_id=?;', [unit_number, lesson_number, course_id]);
+}
+
+coursesModel.getQuestionsByTestId = (test_id) => {
+  return pool.query('SELECT * FROM question WHERE test_test_id = ?', [test_id]);
+}
+
+coursesModel.getAnswersByQuestionId = (question_id) => {
+  console.log('model question_id', question_id)
+  return pool.query('SELECT * FROM answer WHERE question_question_id=?;', [question_id]);
 }
 
 module.exports = coursesModel;

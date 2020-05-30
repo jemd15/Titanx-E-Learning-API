@@ -4,6 +4,13 @@ const authModel = require('../models/auth.models');
 const jwt = require('jsonwebtoken');
 const helpers = require('../lib/helpers');
 
+router.get('/', (req, res) => {
+  res.send(200).json({
+    success:true,
+    message: 'API works!'
+  });
+})
+
 router.post('/login', (req, res) => {
   const {
     email,

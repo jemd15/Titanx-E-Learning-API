@@ -203,7 +203,7 @@ router.get('/lesson/:lesson_id/activities', verifyRole.student, (req, res) => {
 
 // get activity by course_id, unit_number and lesson_number
 router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_number/activities', verifyRole.student, (req, res) => {
-  coursesModel.getActivityOfALesson(req.params.course_id, req.params.lesson_number, req.params.lesson_number)
+  coursesModel.getActivityOfALesson(req.params.course_id, req.params.unit_number, req.params.lesson_number)
     .then(activities => {
       res.status(200).json({
         success:true,
@@ -243,9 +243,9 @@ router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_id/activity/new'
     });
 });
 
-// get test by lesson_id
-router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_id/test', verifyRole.student, (req, res) => {
-  coursesModel.getTestByLessonId(req.params.course_id, req.params.lesson_number, req.params.lesson_number)
+// get test by course_id
+router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_number/test', verifyRole.student, (req, res) => {
+  coursesModel.getTestByCourseId(req.params.course_id, req.params.unit_number, req.params.lesson_number)
     .then(test => {
       res.status(200).json({
         success:true,
@@ -260,5 +260,44 @@ router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_id/test', verify
       })
     })
 });
+
+// get questions by test_id
+router.get('/test/:test_id/questions', verifyRole.student, (req, res) => {
+  console.log('get questions by test_id =', req.params.test_id)
+  coursesModel.getQuestionsByTestId(req.params.test_id)
+    .then(questions => {
+      console.log('questions', questions)
+      res.status(200).json({
+        success:true,
+        message: `Questions from test with id ${req.params.test_id}`,
+        questions
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        message: err.message
+      })
+    })
+})
+
+// get answers by question_id
+router.get('/question/:question_id/answers', verifyRole.student, (req, res) => {
+  console.log('router question_id', req.question_id)
+  coursesModel.getAnswersByQuestionId(req.params.question_id)
+    .then(answers => {
+      res.status(200).json({
+        success:true,
+        message: `Answers from question with id ${req.params.question_id}`,
+        answers
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        message: err.message
+      })
+    })
+})
 
 module.exports = router;
