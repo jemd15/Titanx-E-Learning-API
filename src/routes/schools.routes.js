@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const schoolsModel = require('../models/schools.models');
+const verifyRole = require('../lib/verifyRole');
 
 // get schools
-router.get('/', (req, res) => {
+router.get('/', verifyRole.admin, (req, res) => {
   schoolsModel.getSchools()
     .then(schools => {
       res.status(200).json({
@@ -21,7 +22,7 @@ router.get('/', (req, res) => {
 });
 
 // create school
-router.post('/new', (req, res) => {
+router.post('/new', verifyRole.admin, (req, res) => {
   const { name } = req.body;
   const school = {
     name

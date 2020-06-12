@@ -3,7 +3,7 @@ let moment = require('moment');
 let usersModel = {};
 
 usersModel.getUsers = () => {
-  return pool.query('SELECT * FROM user');
+  return pool.query('SELECT user.*, teacher_id, student_id FROM user LEFT JOIN teacher ON user.user_id=teacher.user_user_id LEFT JOIN student ON user.user_id=student.user_user_id;');
 }
 
 usersModel.getTeachers = () => {

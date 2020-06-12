@@ -89,7 +89,7 @@ router.get('/admins', verifyRole.admin, (req, res) => {
 });
 
 // create user
-router.post('/new', async (req, res) => {
+router.post('/new', verifyRole.teacher, async (req, res) => {
   const {
     name, lastName, email, password, rol, school_school_id
   } = req.body;

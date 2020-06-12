@@ -41,26 +41,33 @@ router.get('/course/:course_id', verifyRole.student, (req, res) => {
 
 // create course
 router.post('/course/new', verifyRole.teacher, (req, res) => {
-  const { school_id, name, img_url, teacher_teacher_id, teacher_user_user_id, teacher_school_school_id } = req.body;
+  const { school_id, name, img_url, teacher_teacher_id } = req.body;
   const course = {
-    school_id, name, img_url, teacher_teacher_id, teacher_user_user_id, teacher_school_school_id
+    school_id, 
+    name, 
+    img_url,
+    teacher_teacher_id,
+    teacher_school_school_id: school_id
   };
 
+  console.log('1)', course);
+  
   coursesModel.createCourse(course)
-   .then(newCourse => {
-     course.course_id = newCourse.insertId;
-     res.status(200).json({
-       success: true,
-       message: 'Course created successfully.',
-       newCourse: course
-     });
-   })
-   .catch(err => {
-     res.status(500).json({
-       success: false,
-       message: err.sqlMessage
-     });
-   });
+  .then(newCourse => {
+    course.course_id = newCourse.insertId;
+    res.status(200).json({
+      success: true,
+      message: 'Course created successfully.',
+      newCourse: course
+    });
+  })
+  .catch(err => {
+      console.log('2)', err.sqlMessage);
+      res.status(500).json({
+        success: false,
+        message: err.sqlMessage
+      });
+    });
 });
 
 // get units
@@ -280,6 +287,7 @@ router.get('/question/:question_id/answers', verifyRole.student, (req, res) => {
     });
 });
 
+// get resolved test by course_id
 router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_number/resolvedTests', verifyRole.teacher, (req, res) => {
   coursesModel.getResolvedTestsByCourseId(req.params.course_id, req.params.unit_number, req.params.lesson_number)
     .then(resolvedTests => {
