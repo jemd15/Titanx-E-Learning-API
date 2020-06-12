@@ -40,6 +40,10 @@ coursesModel.getLessonById = (lesson_id) => {
   return pool.query('SELECT * FROM lesson WHERE lesson_id = ?' , [lesson_id]);
 }
 
+coursesModel.getLessonByCourseId = (course_id, unit_number, lesson_number) => {  
+  return pool.query('SELECT lesson.* FROM course INNER JOIN unit ON unit.course_course_id=course_id INNER JOIN lesson on lesson.unit_unit_id=unit.unit_id WHERE course.course_id=? AND unit.number=? AND lesson.number=?;' , [course_id, unit_number, lesson_number]);
+}
+
 coursesModel.createLesson = (lesson) => {
   return pool.query('INSERT INTO lesson set ?', [lesson]);
 }
@@ -57,7 +61,7 @@ coursesModel.createActivity = (activity) => {
 }
 
 coursesModel.getTestByCourseId = (course_id, unit_number, lesson_number) => {
-  return pool.query('SELECT test.* FROM test  INNER JOIN lesson  ON lesson.lesson_id=test.lesson_lesson_id INNER JOIN unit  ON unit.unit_id=lesson.unit_unit_id  INNER JOIN course  ON unit.course_course_id=course.course_id  WHERE unit.number=? AND lesson.number=? AND course_id=?;', [unit_number, lesson_number, course_id]);
+  return pool.query('SELECT test.* FROM test INNER JOIN lesson ON lesson.lesson_id=test.lesson_lesson_id INNER JOIN unit ON unit.unit_id=lesson.unit_unit_id INNER JOIN course ON unit.course_course_id=course.course_id WHERE unit.number=? AND lesson.number=? AND course_id=?;', [unit_number, lesson_number, course_id]);
 }
 
 coursesModel.getQuestionsByTestId = (test_id) => {
@@ -65,8 +69,15 @@ coursesModel.getQuestionsByTestId = (test_id) => {
 }
 
 coursesModel.getAnswersByQuestionId = (question_id) => {
-  console.log('model question_id', question_id)
   return pool.query('SELECT * FROM answer WHERE question_question_id=?;', [question_id]);
+}
+
+coursesModel.getResolvedTestsByCourseId = (course_id, unit_number, lesson_number) => {
+  return pool.query("SELECT resolved_test.resolved_test_id, test_test_id as test_id, test_lesson_lesson_id as lesson_id, test_lesson_unit_unit_id as unit_id, test_lesson_unit_course_course_id as course_id, course.name as course, unit.number as unit, lesson.number as lesson, concat(user.name, ' ', user.lastName) as student FROM resolved_test INNER JOIN lesson ON lesson.lesson_id=test_lesson_lesson_id INNER JOIN unit ON unit.unit_id=test_lesson_unit_unit_id INNER JOIN course ON course.course_id=test_lesson_unit_course_course_id INNER JOIN student on student.student_id=student_student_id INNER JOIN user ON user.user_id=student.user_user_id WHERE course_id=? AND unit_number=? AND lesson_number=?", [course_id, unit_number, lesson_number]);
+}
+
+coursesModel.insertResolvedTest = () => {
+
 }
 
 module.exports = coursesModel;

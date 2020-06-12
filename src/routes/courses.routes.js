@@ -81,24 +81,6 @@ router.get('/course/:course_id/units', verifyRole.student, (req, res) => {
     });
 });
 
-// get unit by course_id
-/* router.get('/course/:course_id/units/', verifyRole.student, (req, res) => {
-  coursesModel.getUnitByCourseId(req.params.unit_id)
-    .then(unit => {
-      res.status(200).json({
-        success:true,
-        message: `unit with id ${req.params.unit_id}.`,
-        unit
-      });
-    })
-    .catch(err => {
-      res.status(500).json({
-        success:false,
-        message: `error on get unit with id ${req.params.unit_id}.`
-      });
-    });
-}); */
-
 // create unit
 router.post('/course/:course_id/unit/new', verifyRole.teacher, (req, res) => {
   const { number, title, description, state, course_course_id } = req.body;
@@ -123,24 +105,6 @@ router.post('/course/:course_id/unit/new', verifyRole.teacher, (req, res) => {
     });
 });
 
-// get lessons
-/* router.get('/units/lessons', verifyRole.student, (req, res) => { 
-  coursesModel.getLessonsByUnitId(req.params.unit_id)
-    .then(lessons => {
-      res.status(200).json({
-        success: true,
-        message: `Lessons from unit with id ${req.params.unit_id}`,
-        lessons
-      });
-    })
-    .catch(err => {
-      res.status(500).json({
-        success:false,
-        message: `error on get lessons from unit with id ${req.params.unit_id}.`
-      });
-    });
-}); */
-
 // get lesson by unit_id
 router.get('/unit/:unit_id/lessons', verifyRole.student, (req, res) => {
   coursesModel.getLessonsByUnitId(req.params.unit_id)
@@ -161,9 +125,9 @@ router.get('/unit/:unit_id/lessons', verifyRole.student, (req, res) => {
 
 // create lesson
 router.post('/unit/:unit_id/lesson/new', verifyRole.teacher, (req, res) => {
-  const { number, description, unit_unit_id, unit_course_course_id } = req.body;
+  const { number, unit_unit_id, unit_course_course_id, title } = req.body;
   const lesson = {
-    number, description, unit_unit_id, unit_course_course_id
+    number, unit_unit_id, unit_course_course_id, title
   };
 
   coursesModel.createLesson(lesson)
@@ -220,25 +184,42 @@ router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_number/activitie
 });
 
 // create activity
-router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_id/activity/new', verifyRole.teacher, (req, res) => {
-  const { number, description, type, url, lesson_lesson_id, lesson_unit_unit_id, lesson_unit_course_course_id } = req.body;
-  const activity = {
-    number, description, type, url, lesson_lesson_id, lesson_unit_unit_id, lesson_unit_course_course_id
+router.post('/course/:course_id/unit/:unit_number/lesson/:lesson_number/activity/new', verifyRole.teacher, (req, res) => {
+  const { number, title, description, type, url } = req.body;
+  let activity = {
+    number,
+    title,
+    description,
+    type,
+    url
   }
 
-  coursesModel.createActivity(activity)
-    .then(newActivity => {
-      activity.activity_id = newActivity.insertId;
-      res.status(200).json({
-        success: true,
-        message: `Activity create on unit with id ${req.params.lesson_id} sucessfully`,
-        activity
-      });
+  coursesModel.getLessonByCourseId(req.params.course_id, req.params.unit_number, req.params.lesson_number)
+    .then(lesson => {
+      activity.lesson_lesson_id = lesson[0].lesson_id;
+      activity.lesson_unit_unit_id = lesson[0].unit_unit_id;
+      activity.lesson_unit_course_course_id = lesson[0].unit_course_course_id;
+
+      coursesModel.createActivity(activity)
+        .then(newActivity => {
+          activity.activity_id = newActivity.insertId;
+          res.status(200).json({
+            success: true,
+            message: `Activity create on lesson ${req.params.lesson_number} sucessfully`,
+            activity
+          });
+        })
+        .catch(err => {
+          res.status(500).json({
+            success:false,
+            message: `error on create activity on lesson ${req.params.lesson_number}.`
+          });
+        });
     })
     .catch(err => {
       res.status(500).json({
         success:false,
-        message: `error on create activity on lesson with id ${req.params.lesson_id}.`
+        message: `error on create activity on lesson ${req.params.lesson_number}.`
       });
     });
 });
@@ -277,13 +258,12 @@ router.get('/test/:test_id/questions', verifyRole.student, (req, res) => {
       res.status(500).json({
         success: false,
         message: err.message
-      })
-    })
-})
+      });
+    });
+});
 
 // get answers by question_id
 router.get('/question/:question_id/answers', verifyRole.student, (req, res) => {
-  console.log('router question_id', req.question_id)
   coursesModel.getAnswersByQuestionId(req.params.question_id)
     .then(answers => {
       res.status(200).json({
@@ -296,8 +276,53 @@ router.get('/question/:question_id/answers', verifyRole.student, (req, res) => {
       res.status(500).json({
         success: false,
         message: err.message
-      })
+      });
+    });
+});
+
+router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_number/resolvedTests', verifyRole.teacher, (req, res) => {
+  coursesModel.getResolvedTestsByCourseId(req.params.course_id, req.params.unit_number, req.params.lesson_number)
+    .then(resolvedTests => {
+      res.status(200).json({
+        success: true,
+        message: `Resolved Test from lesson ${req.params.lesson_number} from ${req.params.unit_number} from course with id ${req.params.course_id}`,
+        resolvedTests
+      });
     })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        message: `Error on getResolvedTestsByCourseId`
+      });
+    });
+});
+
+// response test
+router.post('/resolved_test/new', verifyRole.teacher, (req, res) => {
+  const { test_id, lesson_id, unit_id, course_id, question_id, answer_id, studen_id } = req.body;
+  const newResolvedTest = { 
+    test_id, 
+    lesson_id, 
+    unit_id, 
+    course_id, 
+    question_id, 
+    answer_id, studen_id
+  }
+
+  coursesModel.insertResolvedTest(newResolvedTest)
+    .then(newResolvedTest => {
+      res.status(200).json({
+        success: true,
+        message: `New resolved test received from studen with id ${studen_id}.`,
+        newResolvedTest
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        message: `Error on insert new resolved test.`
+      });
+    });
 })
 
 module.exports = router;
