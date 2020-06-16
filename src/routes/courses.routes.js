@@ -331,6 +331,54 @@ router.post('/resolved_test/new', verifyRole.teacher, (req, res) => {
         message: `Error on insert new resolved test.`
       });
     });
-})
+});
+
+// asign course to student
+router.post('/course/add-student', verifyRole.teacher, (req, res) => {
+  const { course_id, student_id, school_id } = req.body;
+  const data = {
+    course_course_id: course_id, 
+    student_student_id: student_id, 
+    student_school_school_id: school_id
+  };  
+
+  coursesModel.asignCourseToStudent(data)
+    .then(newAsignment => {
+      res.status(200).json({
+        success: true,
+        message: `Student asign to course with id ${data.course_id}`,
+        newAsignment
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        message: `Error to asign student to course with id ${data.course_id}`,
+        err: err.sqlMessage
+      });
+    });
+});
+
+router.delete('/course/:courseId/student/:studentId/remove-student', verifyRole.teacher, (req, res) => {
+  let course_id = req.params.courseId
+  let student_id = req.params.studentId
+
+  coursesModel.removeStudentFromCourse(course_id, student_id)
+    .then(data => {
+      res.status(200).json({
+        success: true,
+        message: "Student removed successfully",
+        removed: data
+      });
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json({
+        success: false,
+        message: "Error on remove student",
+        err: err.sqlMessage
+      });
+    });
+});
 
 module.exports = router;

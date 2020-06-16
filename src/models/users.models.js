@@ -52,4 +52,12 @@ usersModel.createUser = (user) => { // transformar esto en transacción
     })
 }
 
+usersModel.getStudentsBySchoolId = (school_id) => {
+  return pool.query("SELECT * FROM user INNER JOIN student ON user.user_id=student.user_user_id WHERE student.school_school_id=3 AND rol='student' ORDER BY name;", [school_id]);
+}
+
+usersModel.getStudentsByCourseId = (course_id) => {
+  return pool.query('SELECT user.*, student.student_id FROM titanxcl_e_learning.course_has_student INNER JOIN student ON course_has_student.student_student_id=student.student_id INNER JOIN user ON student.user_user_id=user.user_id WHERE course_course_id=?;', [course_id]);
+}
+
 module.exports = usersModel;

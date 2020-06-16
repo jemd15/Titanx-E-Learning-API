@@ -67,6 +67,42 @@ router.get('/students', verifyRole.teacher, (req, res) => {
     });
 });
 
+// get students by schoolId
+router.get('/school/:school_id', verifyRole.teacher, (req, res) => {
+  usersModel.getStudentsBySchoolId(req.params.school_id)
+    .then(students => {
+      res.status(200).json({
+        success: true,
+        message: `Students from school with id = ${req.params.school_id}`,
+        students
+      });
+    })
+    .catch(err => {
+      res.send(500).json({
+        success: false,
+        message: `Error on getStudentsBySchoolId`
+      });
+    });
+});
+
+// get students by courseId
+router.get('/course/:course_id', verifyRole.teacher, (req, res) => {
+  usersModel.getStudentsByCourseId(req.params.course_id)
+    .then(students => {
+      res.status(200).json({
+        success: true,
+        message: `Students from course with id = ${req.params.course_id}`,
+        students
+      });
+    })
+    .catch(err => {
+      res.send(500).json({
+        success: false,
+        message: `Error on getStudentsByCourseId`
+      });
+    });
+});
+
 // get admins
 router.get('/admins', verifyRole.admin, (req, res) => {
   usersModel.getAdmins()

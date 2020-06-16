@@ -84,4 +84,15 @@ coursesModel.insertResolvedTest = () => {
 
 }
 
+coursesModel.asignCourseToStudent = (asignment) => {
+  console.log(asignment)
+  return pool.query('INSERT INTO course_has_student set ?', [asignment]);
+}
+
+coursesModel.removeStudentFromCourse = (course_id, student_id) => {
+  console.log('data to delete:', course_id, student_id);
+  
+  return pool.query('DELETE FROM `course_has_student` WHERE (`course_course_id` = ?) and (`student_student_id` = ?);', [course_id, student_id])
+}
+
 module.exports = coursesModel;
