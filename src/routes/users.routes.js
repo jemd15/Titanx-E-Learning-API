@@ -152,4 +152,24 @@ router.post('/new', verifyRole.teacher, async (req, res) => {
     });
 });
 
+router.put('/change-state', verifyRole.admin, (req, res) => {
+  const { user_id, state } = req.body;
+  const userChanges = { user_id, state };
+
+  usersModel.changeState(userChanges)
+    .then(changes => {
+      res.status(200).json({
+        success: true,
+        message: 'User state updated correctly',
+        changes
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        message: err.sqlMessage
+      });
+    });
+});
+
 module.exports = router;

@@ -60,4 +60,8 @@ usersModel.getStudentsByCourseId = (course_id) => {
   return pool.query('SELECT user.*, student.student_id FROM titanxcl_e_learning.course_has_student INNER JOIN student ON course_has_student.student_student_id=student.student_id INNER JOIN user ON student.user_user_id=user.user_id WHERE course_course_id=?;', [course_id]);
 }
 
+usersModel.changeState = (userChanges) => {
+  return pool.query('UPDATE user SET state = ? WHERE user_id = ?', [userChanges.state, userChanges.user_id]);
+}
+
 module.exports = usersModel;

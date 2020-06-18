@@ -23,7 +23,8 @@ router.post('/login', (req, res) => {
 
   authModel.getUserByEmail(login.email)
     .then(userFound => {
-      helpers.matchPassword(login.password, userFound[0].password)
+      if(userFound[0].state == 'active'){
+        helpers.matchPassword(login.password, userFound[0].password)
         .then((success) => {
           if(success){
             const token = jwt.sign({ userFound }, 'jwt-secret'); // cambiar por secret variable de entorno
@@ -48,6 +49,12 @@ router.post('/login', (req, res) => {
             message: 'Email or password wrong.'
           });
         });
+      } else {
+        res.status(401).json({
+          success: false,
+          message: 'User blocked by the Administrator.'
+        })
+      }
     })
     .catch(err => {
       res.status(401).json({
