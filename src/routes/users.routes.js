@@ -25,6 +25,40 @@ router.get('/', verifyRole.admin, (req, res) => {
     });
 });
 
+// post users with pagination
+router.post('/', verifyRole.admin, (req, res) => {
+  const { page, limit } = req.body;
+  const pagination = { limit, page };
+
+  usersModel.getUsersQuantity()
+    .then(usersQuantity => {
+      let pages = Math.ceil(usersQuantity[0].user_quantity/pagination.limit);
+      console.log('getUsersWithPagination', pagination.limit, (pagination.page * pagination.limit) - 1);
+
+      usersModel.getUsersWithPagination(pagination.limit, (pagination.page - 1) * pagination.limit)
+        .then(users => {
+          res.status(200).json({
+            success: true,
+            message: `Users page ${pagination.page}`,
+            users,
+            pages
+          });
+        })
+        .catch(err => {
+          res.status(500).json({
+            success: false,
+            message: 'Error on get usars paginated'
+          });
+        });
+    })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        message: `Error on get users page ${pagination.page}`
+      });
+    });
+});
+
 // get teachers
 router.get('/teachers', verifyRole.admin, (req, res) => {
   usersModel.getTeachers()
