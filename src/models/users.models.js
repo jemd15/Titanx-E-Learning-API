@@ -34,8 +34,8 @@ usersModel.createUser = (user) => { // transformar esto en transacción
       if(user.rol == 'teacher'){
         return pool.query('INSERT INTO teacher set ?', [{ user_user_id: userData.insertId, school_school_id: user.school_school_id }])
         .then((teacherData) => {
-          teacherData.insertId = userData.insertId
-          return teacherData
+          teacherData.insertId = userData.insertId;
+          return teacherData;
         })
         .catch(err => {
           return err;
@@ -43,21 +43,22 @@ usersModel.createUser = (user) => { // transformar esto en transacción
       } else if (user.rol == 'student') {
         return pool.query('INSERT INTO student set ?', [{ user_user_id: userData.insertId, school_school_id: user.school_school_id }])
         .then((studentData) => {
-          studentData.insertId = userData.insertId
-          return studentData
+          studentData.insertId = userData.insertId;
+          return studentData;
         })
         .catch(err => {
           return err;
         });
       } else if (user.rol == 'admin') {
-        return userData
+        return userData;
       }else {
         return new Error('error al crear usuario');
       }
     })
     .catch(err => {
+      // console.error(err.sqlMessage);
       return err;
-    })
+    });
 }
 
 usersModel.getStudentsBySchoolId = (school_id) => {

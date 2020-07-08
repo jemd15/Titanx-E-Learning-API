@@ -27,12 +27,18 @@ router.get('/', verifyRole.admin, (req, res) => {
 
 // post users with pagination
 router.post('/', verifyRole.admin, (req, res) => {
-  const { page, limit } = req.body;
-  const pagination = { limit, page };
+  const {
+    page,
+    limit
+  } = req.body;
+  const pagination = {
+    limit,
+    page
+  };
 
   usersModel.getUsersQuantity()
     .then(usersQuantity => {
-      let pages = Math.ceil(usersQuantity[0].user_quantity/pagination.limit);
+      let pages = Math.ceil(usersQuantity[0].user_quantity / pagination.limit);
       console.log('getUsersWithPagination', pagination.limit, (pagination.page * pagination.limit) - 1);
 
       usersModel.getUsersWithPagination(pagination.limit, (pagination.page - 1) * pagination.limit)
@@ -161,22 +167,45 @@ router.get('/admins', verifyRole.admin, (req, res) => {
 // create user
 router.post('/new', verifyRole.teacher, async (req, res) => {
   const {
-    name, lastName, email, password, rol, school_school_id
+    name,
+    lastName,
+    email,
+    password,
+    rol,
+    school_school_id
   } = req.body;
   const user = {
-    name, lastName, email, password, rol, school_school_id
+    name,
+    lastName,
+    email,
+    password,
+    rol,
+    school_school_id,
+    state: 'active'
   }
   user.password = await helpers.encyptPassword(user.password);
 
   usersModel.createUser(user)
     .then(newUser => {
-      user.user_id = newUser.insertId
-      // delete user['password'];
-      res.status(200).json({
-        success: true,
-        message: 'User created successfully.',
-        newUser: user
-      });
+      console.log({
+        newUser: newUser.code
+      })
+      if (newUser.code == 'ER_DUP_ENTRY') {
+        console.log(newUser)
+        res.status(500).json({
+          success: false,
+          message: newUser.sqlMessage
+        });
+      } else {
+        user.user_id = newUser.insertId;
+        delete user['password'];
+        res.status(200).json({
+          success: true,
+          message: 'User created successfully.',
+          newUser: user
+        });
+      }
+
     })
     .catch(err => {
       res.status(500).json({
@@ -187,8 +216,14 @@ router.post('/new', verifyRole.teacher, async (req, res) => {
 });
 
 router.put('/change-state', verifyRole.admin, (req, res) => {
-  const { user_id, state } = req.body;
-  const userChanges = { user_id, state };
+  const {
+    user_id,
+    state
+  } = req.body;
+  const userChanges = {
+    user_id,
+    state
+  };
 
   usersModel.changeState(userChanges)
     .then(changes => {
