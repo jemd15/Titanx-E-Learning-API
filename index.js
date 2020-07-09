@@ -29,7 +29,7 @@ app.use('/api/users', require('./src/routes/users.routes'));
 app.use('/api',require('./src/routes/courses.routes'));
 
 // public
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api/imgs', express.static(path.join(__dirname, 'src/public/imgs')));
 
 // starting the server
 app.listen(app.get('port'), () => {
