@@ -73,4 +73,8 @@ usersModel.changeState = (userChanges) => {
   return pool.query('UPDATE user SET state = ? WHERE user_id = ?', [userChanges.state, userChanges.user_id]);
 }
 
+usersModel.verifyUser = (userEmail) => {
+  return pool.query('UPDATE user SET emailVerified = "true" WHERE email = ?', [userEmail]);
+}
+
 module.exports = usersModel;

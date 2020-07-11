@@ -1,0 +1,55 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-all padding="0px"></mj-all>
+      <mj-text font-family="Ubuntu, Helvetica, Arial, sans-serif" padding="0 25px" font-size="13px"></mj-text>
+      <mj-section background-color="#FFFFFF"></mj-section>
+      <mj-class name="preheader" color="#000000" font-size="11px"></mj-class>
+    </mj-attributes>
+    <mj-style inline="inline">
+      a { 
+        text-decoration: none!important; 
+        color: #FFF;
+      }
+      a:last-child() { 
+        text-decoration: none!important; 
+        background-color: red!important; 
+      } 
+      img {
+        width: 100% !important;
+        position: retalive;
+        margin: 0 auto; 
+        background-size: cover; 
+        background-position: center;
+      }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f5f5f5">
+    <mj-section>
+      <mj-column width="100%">
+        <mj-image align="center" src="https://e-learning.titanx.cl/api/imgs/email-header.png" alt="USS eLearning" padding="0px"></mj-image>
+      </mj-column>
+    </mj-section>
+    <mj-section padding-bottom="20px" padding-top="10px">
+      <mj-column>
+        <mj-text align="left" padding="10px 25px" font-size="20px" color="#1a232f"><strong>Estimado ${name} ${lastName},</strong></mj-text>
+        <mj-text align="left" font-size="18px" font-family="Arial">
+          <br></br>
+          Bienvenido a la plataforma de e-learning Titanx. Se a creado una cuenta para este servicio con las siguientes credenciales:
+          <br></br>
+          email: <strong>${email}</strong>
+          <br></br>
+          contraseña: <strong>${password}</strong>
+          <br></br>
+          Ingrese al siguiente link para verificar su cuenta:
+          <br></br>
+        </mj-text>
+        <mj-button background-color="#1a232f" href="${link}" font-family="Arial, sans-serif" padding="20px 0 0 0" font-weight="bold" font-size="16px">VERIFICAR CUENTA</mj-button>
+        <mj-text align="center" color="#000000" font-size="14px" font-family="Arial, sans-serif" padding-top="40px">
+          <hr></hr>
+          <p>Este mail ha sido generado automáticamente. Por favor no responder.</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

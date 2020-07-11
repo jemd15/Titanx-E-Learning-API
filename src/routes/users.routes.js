@@ -4,6 +4,7 @@ const usersModel = require('../models/users.models');
 const helpers = require('../lib/helpers');
 const verifyRole = require('../lib/verifyRole');
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 
 // get users
 router.get('/', verifyRole.admin, (req, res) => {
@@ -184,7 +185,8 @@ router.post('/new', verifyRole.teacher, async (req, res) => {
     school_school_id,
     state: 'active'
   }
-  const link = 'http://localhost:4200/#/verify-account';
+  const token = jwt.sign({ name: user.name, lastName: user.lastName, email: user.email, tokenType: 'verifyEmail' }, 'jwt-secret'); // cambiar por secret variable de entorno
+  const link = 'https://e-learning.titanx.cl/#/verify-email/' + token;
 
   console.log('Creando nuevo usuario');
   user.password = await helpers.encyptPassword(user.password);
@@ -303,7 +305,7 @@ router.post('/new', verifyRole.teacher, async (req, res) => {
                   <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
                     <tbody>
                       <tr>
-                        <td style="background-color:transparent;vertical-align:top;padding:0px;">
+                        <td style="vertical-align:top;padding:0px;">
                           <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
                             <tr>
                               <td align="center" style="font-size:0px;padding:0px;word-break:break-word;">
@@ -401,37 +403,6 @@ router.post('/new', verifyRole.teacher, async (req, res) => {
                                         target="_blank">
                                         VERIFICAR CUENTA
                                       </a> </td>
-                                  </tr>
-                                </table>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td align="left" style="font-size:0px;padding:0 25px;word-break:break-word;">
-                                <div
-                                  style="font-family:Arial;font-size:18px;line-height:1;text-align:left;color:#000000;">
-                                  <br><br> o puede copiar este link en su navegador:</div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td align="center" style="font-size:0px;padding:0 25px;word-break:break-word;">
-                                <div
-                                  style="font-family:Arial;font-size:22px;line-height:1;text-align:center;color:#000000;">
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td align="center" vertical-align="middle"
-                                style="font-size:0px;padding:20px 0 0 0;word-break:break-word;">
-                                <table border="0" cellpadding="0" cellspacing="0" role="presentation"
-                                  style="border-collapse:separate;width:92%;line-height:100%;">
-                                  <tr>
-                                    <td align="center" bgcolor="#f5f5f5" role="presentation"
-                                      style="border:none;border-radius:3px;cursor:auto;mso-padding-alt:10px 25px;background:#f5f5f5;"
-                                      valign="middle">
-                                      <p
-                                        style="display:inline-block;background:#f5f5f5;color:#512d0b;font-family:Arial, sans-serif;font-size:16px;font-weight:bold;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:3px;">
-                                        ${link} </p>
-                                    </td>
                                   </tr>
                                 </table>
                               </td>
@@ -535,6 +506,7 @@ router.post('/new', verifyRole.teacher, async (req, res) => {
     });
 });
 
+// change estate
 router.put('/change-state', verifyRole.admin, (req, res) => {
   const {
     user_id,
@@ -559,6 +531,43 @@ router.put('/change-state', verifyRole.admin, (req, res) => {
         message: err.sqlMessage
       });
     });
+});
+
+// verifying the email with token
+router.post('/verify-email', async (req, res) => {
+  const { token } = req.body;
+  
+  jwt.verify(token, 'jwt-secret', function (err, decoded) {
+    if (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Error on verify email.'
+      });
+    } else {
+      if (decoded.tokenType = 'verifyEmail') {
+        console.log('token email', decoded.email);
+        usersModel.verifyUser(decoded.email)
+          .then(() => {
+            res.status(200).json({
+              success: true,
+              message: 'Email verified.',
+              decoded
+            });
+          })
+          .catch(err => {
+            res.status(500).json({
+              success: false,
+              message: 'Error on verify email on db.'
+            });
+          });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: 'Token not valid.'
+        });
+      }
+    }
+  });
 });
 
 module.exports = router;

@@ -27,9 +27,9 @@ router.post('/login', (req, res) => {
         helpers.matchPassword(login.password, userFound[0].password)
         .then((success) => {
           if(success){
+            delete userFound[0].password;
             const token = jwt.sign({ userFound }, 'jwt-secret'); // cambiar por secret variable de entorno
             userFound[0].token = token;
-            delete userFound[0]['password'];
             res.status(200).json({
               success: true,
               message: 'Loggin success.',
