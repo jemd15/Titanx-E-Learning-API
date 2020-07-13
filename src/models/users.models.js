@@ -1,5 +1,6 @@
 const pool = require('../database');
 let moment = require('moment');
+const { query } = require('express');
 let usersModel = {};
 
 usersModel.getUsers = () => {
@@ -75,6 +76,14 @@ usersModel.changeState = (userChanges) => {
 
 usersModel.verifyUser = (userEmail) => {
   return pool.query('UPDATE user SET emailVerified = "true" WHERE email = ?', [userEmail]);
+}
+
+usersModel.changeUserPass = (newUserData) => {
+  return pool.query('UPDATE user SET password = ? WHERE user_id = ?', [newUserData.newPassword, newUserData.user_id]);
+}
+
+usersModel.updateUserData = (newUserData) => {
+  return pool.query('UPDATE user SET name = ?, lastName = ?, email = ? WHERE user_id = ?', [newUserData.name, newUserData.lastName, newUserData.email]);
 }
 
 module.exports = usersModel;

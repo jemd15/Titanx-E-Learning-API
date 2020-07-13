@@ -5,6 +5,7 @@ const helpers = require('../lib/helpers');
 const verifyRole = require('../lib/verifyRole');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
+const authModel = require('../models/auth.models');
 
 // get users
 router.get('/', verifyRole.admin, (req, res) => {
@@ -568,6 +569,69 @@ router.post('/verify-email', async (req, res) => {
       }
     }
   });
+});
+
+// update user data
+router.put('/update/:user_id', verifyRole.student, (req, res) => {
+  const { user_id, name, lastName, email } = req.body;
+  const userNewData = { user_id, name, lastName, email };
+
+  usersModel.updateUserData(userNewData)
+    .then(newUserData => {
+      res.status(200).json({
+        success: true,
+        message: 'Data correctly actualized.',
+        newUserData
+      });
+    })
+    .catch(error => {
+      res.status(500).json({
+        success: false,
+        message: 'Error on save new data.',
+        error
+      });
+    });
+});
+
+// change user password
+router.put('/:user_id/change-pass', verifyRole.student, (req, res) => {
+  const { user_id, password, newPassword } = req.body;
+  const newUserData = { user_id, password, newPassword };
+
+  authModel.getUserByEmail(newUserData.email)
+    .then(userFound => {
+      helpers.matchPassword(newUserData.password, userFound[0].password)
+        .then(async () => {
+          newUserData.newPassword = await helpers.encyptPassword(newUserData.newPassword);
+          usersModel.changeUserPass(newUserData)
+            .then(() => {
+              res.status(200).json({
+                success: true,
+                message: 'Password correctly actualized.'
+              });
+            })
+            .catch(error => {
+              res.status(500).json({
+                success: false,
+                message: 'Error on save new password.',
+                error
+              });
+            });
+        })
+        .catch(err => {
+          res.send(200).json({
+            success: false,
+            message: 'Current password is wrong.'
+          });
+        });
+    })
+    .catch(error => {
+      res.send(200).json({
+        success: false,
+        message: 'User not found.',
+        error
+      });
+    });
 });
 
 module.exports = router;
