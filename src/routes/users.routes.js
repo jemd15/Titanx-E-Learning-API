@@ -572,39 +572,42 @@ router.post('/verify-email', async (req, res) => {
 });
 
 // update user data
-router.put('/update/:user_id', verifyRole.student, (req, res) => {
-  const { user_id, name, lastName, email } = req.body;
-  const userNewData = { user_id, name, lastName, email };
+router.put('/update', verifyRole.student, (req, res) => {
+  const { user_id, name, lastName, email, newEmail } = req.body;
+  const userNewData = { user_id, name, lastName, email, newEmail };
 
   usersModel.updateUserData(userNewData)
-    .then(newUserData => {
+    .then(data => {
+      if (data.affectedRows == 0) {
+        throw new Error ('Affected rows matched: 0');
+      }
       res.status(200).json({
         success: true,
-        message: 'Data correctly actualized.',
-        newUserData
+        message: 'Data correctly actualized.'
       });
     })
     .catch(error => {
       res.status(500).json({
         success: false,
-        message: 'Error on save new data.',
-        error
+        message: 'User not found.'
       });
     });
 });
 
 // change user password
-router.put('/:user_id/change-pass', verifyRole.student, (req, res) => {
-  const { user_id, password, newPassword } = req.body;
-  const newUserData = { user_id, password, newPassword };
+router.put('/change-pass', verifyRole.student, (req, res) => {
+  const { user_id, password, newPassword, email } = req.body;
+  const newUserData = { user_id, password, newPassword, email };
 
   authModel.getUserByEmail(newUserData.email)
-    .then(userFound => {
+  .then(userFound => {
+      console.log({newUserData, userFound: userFound[0]})
       helpers.matchPassword(newUserData.password, userFound[0].password)
-        .then(async () => {
+        .then(async passMatch => {
           newUserData.newPassword = await helpers.encyptPassword(newUserData.newPassword);
           usersModel.changeUserPass(newUserData)
             .then(() => {
+              if (!passMatch) throw new Error('Password not match.');
               res.status(200).json({
                 success: true,
                 message: 'Password correctly actualized.'
@@ -619,14 +622,16 @@ router.put('/:user_id/change-pass', verifyRole.student, (req, res) => {
             });
         })
         .catch(err => {
-          res.send(200).json({
+          res.status(200).json({
             success: false,
             message: 'Current password is wrong.'
           });
         });
     })
     .catch(error => {
-      res.send(200).json({
+      console.log({error});
+      
+      res.status(500).json({
         success: false,
         message: 'User not found.',
         error

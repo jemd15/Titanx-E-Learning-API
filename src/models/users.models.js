@@ -84,6 +84,7 @@ usersModel.changeUserPass = (newUserData) => {
 
 usersModel.updateUserData = (newUserData) => {
   return pool.query('UPDATE user SET name = ?, lastName = ?, email = ? WHERE user_id = ?', [newUserData.name, newUserData.lastName, newUserData.email]);
+  return pool.query('UPDATE user SET name = ?, lastName = ?, email = ? WHERE user_id = ? AND email = ?', [newUserData.name, newUserData.lastName, newUserData.newEmail, newUserData.user_id, newUserData.email]);
 }
 
 module.exports = usersModel;
