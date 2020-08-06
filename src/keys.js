@@ -4,7 +4,7 @@ module.exports = {
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'titanx-e-learning',
+    database: 'titanx_e-learning',
     port: 3306
   }
 

@@ -139,9 +139,10 @@ router.get('/course/:course_id', verifyRole.teacher, (req, res) => {
       });
     })
     .catch(err => {
-      res.send(500).json({
+      res.status(500).json({
         success: false,
-        message: `Error on getStudentsByCourseId`
+        message: `Error on getStudentsByCourseId`,
+        err
       });
     });
 });

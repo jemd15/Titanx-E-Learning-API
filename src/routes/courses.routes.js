@@ -288,12 +288,15 @@ router.get('/question/:question_id/answers', verifyRole.student, (req, res) => {
 });
 
 // get resolved test by course_id
-router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_number/resolvedTests', verifyRole.teacher, (req, res) => {
-  coursesModel.getResolvedTestsByCourseId(req.params.course_id, req.params.unit_number, req.params.lesson_number)
+router.get('/course/:course_id/resolvedTests', verifyRole.teacher, (req, res) => {
+  const course_id = req.params.course_id
+  console.log(course_id);
+
+  coursesModel.getResolvedTestsByCourseId(course_id)
     .then(resolvedTests => {
       res.status(200).json({
         success: true,
-        message: `Resolved Test from lesson ${req.params.lesson_number} from ${req.params.unit_number} from course with id ${req.params.course_id}`,
+        message: `Resolved Test from course with id ${course_id}`,
         resolvedTests
       });
     })
@@ -305,30 +308,133 @@ router.get('/course/:course_id/unit/:unit_number/lesson/:lesson_number/resolvedT
     });
 });
 
-// response test
-router.post('/resolved_test/new', verifyRole.teacher, (req, res) => {
-  const { test_id, lesson_id, unit_id, course_id, question_id, answer_id, studen_id } = req.body;
-  const newResolvedTest = { 
-    test_id, 
-    lesson_id, 
-    unit_id, 
-    course_id, 
-    question_id, 
-    answer_id, studen_id
+// get resolved test by course_id *** Paginated ***
+router.get('/courses/resolvedTests/page/:page', verifyRole.teacher, (req, res) => {
+  const { page } = req.params;
+  const elementsPerPage = 10;
+
+  coursesModel.getTotalPagesOfResolvedTests()
+    .then(resolvedTests => {
+      pages = Math.ceil(resolvedTests.length / elementsPerPage) ;
+      coursesModel.getResolvedTests(page, elementsPerPage)
+        .then(resolvedTests => {
+          res.status(200).json({
+            success: true,
+            message: `Resolved Test page ${page}`,
+            resolvedTests,
+            pages
+          });
+        })
+        .catch(err => {
+          res.status(500).json({
+            success: false,
+            message: `Error on getResolvedTests`
+          });
+        });
+    })
+});
+
+// search resolved test *** Paginated ***
+router.post('/courses/searchResolvedTests/page/:page', verifyRole.teacher, (req, res) => {
+  const { page } = req.params;
+  const { course, unit, lesson } = req.body;
+  const data = {
+    course,
+    unit,
+    lesson
+  }
+  const elementsPerPage = 10;
+
+  coursesModel.searchTotalPagesOfResolvedTests(data)
+    .then(resolvedTests => {
+      pages = Math.ceil(resolvedTests.length / elementsPerPage) ;
+      coursesModel.searchResolvedTests(page, elementsPerPage, data)
+        .then(resolvedTests => {
+          res.status(200).json({
+            success: true,
+            message: `Resolved Test page ${page}`,
+            resolvedTests,
+            pages
+          });
+        })
+        .catch(err => {
+          res.status(500).json({
+            success: false,
+            message: `Error on searchResolvedTests`
+          });
+        });
+    })
+});
+
+// download resolved test
+router.post('/courses/searchResolvedTests/', verifyRole.teacher, (req, res) => {
+  const { course, unit, lesson } = req.body;
+  const data = {
+    course,
+    unit,
+    lesson
   }
 
-  coursesModel.insertResolvedTest(newResolvedTest)
-    .then(newResolvedTest => {
+  coursesModel.downloadResolvedTests(data)
+    .then(resolvedTests => {
       res.status(200).json({
         success: true,
-        message: `New resolved test received from studen with id ${studen_id}.`,
-        newResolvedTest
+        message: `Resolved Tests from: ${course}, ${unit}, ${lesson}`,
+        resolvedTests
       });
     })
     .catch(err => {
       res.status(500).json({
         success: false,
-        message: `Error on insert new resolved test.`
+        message: `Error on downloadResolvedTests`
+      });
+    });
+});
+
+// response test
+router.post('/courses/resolved_test/new', verifyRole.student, (req, res) => {
+  const { test } = req.body;
+  const newResolvedTest = test;
+  for (let element of newResolvedTest) {
+    delete element.answer_1
+    delete element.answer_2
+    delete element.answer_3
+    delete element.answer_4
+    delete element.type
+  }
+  
+  coursesModel.getResolvedTestsByTestIdAndStudentId(newResolvedTest[0].test_id, newResolvedTest[0].student_id)
+    .then(test => {
+      if (test.length > 0) {
+        res.status(400).json({
+          success: false,
+          message: 'You cannot responce the tests twice.'
+        });
+      } else {
+        coursesModel.insertResolvedTest(newResolvedTest)
+          .then(newResolvedTest => {
+            res.status(200).json({
+              success: true,
+              message: `New resolved test received correctly.`,
+              newResolvedTest
+            });
+          })
+          .catch(err => {
+            console.log(err);
+            res.status(500).json({
+              success: false,
+              message: `Error on insert new resolved test.`,
+              err: err
+            });
+          });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: `Error on insert new resolved test.`,
+        err: err
       });
     });
 });
@@ -359,6 +465,7 @@ router.post('/course/add-student', verifyRole.teacher, (req, res) => {
     });
 });
 
+// remove student from a course
 router.delete('/course/:courseId/student/:studentId/remove-student', verifyRole.teacher, (req, res) => {
   let course_id = req.params.courseId
   let student_id = req.params.studentId

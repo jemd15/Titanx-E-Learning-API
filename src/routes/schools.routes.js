@@ -4,7 +4,7 @@ const schoolsModel = require('../models/schools.models');
 const verifyRole = require('../lib/verifyRole');
 
 // get schools
-router.get('/', verifyRole.admin, (req, res) => {
+router.get('/', verifyRole.teacher, (req, res) => {
   schoolsModel.getSchools()
     .then(schools => {
       res.status(200).json({
