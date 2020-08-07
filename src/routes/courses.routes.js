@@ -366,6 +366,30 @@ router.post('/courses/searchResolvedTests/page/:page', verifyRole.teacher, (req,
     })
 });
 
+// resolved test detail
+router.get('/courses/resolvedTestsDetail/student/:student_id/test/:test_id', verifyRole.teacher, (req, res) => {
+  const { student_id, test_id } = req.params;
+  const data = {
+    student_id,
+    test_id
+  }
+
+  coursesModel.getResolvedTestsDetail(data.student_id, data.test_id)
+    .then(resolvedTests => {
+      res.status(200).json({
+        success: true,
+        message: `Resolved Test Detail, student: ${data.student_id}, test: ${data.test_id}`,
+        resolvedTests
+      });
+    })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        message: `Error on getResolvedTestsDetail`
+      });
+    });
+});
+
 // download resolved test
 router.post('/courses/searchResolvedTests/', verifyRole.teacher, (req, res) => {
   const { course, unit, lesson } = req.body;
