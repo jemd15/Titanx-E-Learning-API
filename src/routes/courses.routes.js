@@ -512,4 +512,54 @@ router.delete('/course/:courseId/student/:studentId/remove-student', verifyRole.
     });
 });
 
+// create new test
+router.post('/courses/newTest', verifyRole.teacher, (req, res) => {
+  const { state, course_id, unit_id, lesson_id, questions } = req.body;
+
+  coursesModel.getTestByLessonId(lesson_id)
+    .then(test => {
+      console.log('test.length:', test.length, {test});
+      if (test) {
+        res.status(500).json({
+          success: false,
+          message: 'You cannot duplicate or make another tests on this lesson'
+        });
+      } else {
+        let createTest = new Promise((resolve, reject) => {
+          coursesModel.createTest(state, course_id, unit_id, lesson_id, questions, (err, res) => {
+            if (!err) {
+              return resolve(true)
+          } else {
+              reject(new Error('Error on createTest'))
+          }
+          })
+        });
+      
+        createTest
+          .then((resolved, rejected) => {
+            console.log(resolved, rejected);
+            res.status(200).json({
+              success: true,
+              message: 'Test created successfully'
+            });
+          })
+          .catch(err => {
+            res.status(500).json({
+              success: false,
+              message: 'Error on createTest',
+              err
+            });
+          });
+      }
+      
+    })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        message: 'Error on getTestByLessonId',
+        err
+      });
+    });
+});
+
 module.exports = router;

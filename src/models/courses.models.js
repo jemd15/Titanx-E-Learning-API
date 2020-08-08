@@ -68,6 +68,10 @@ coursesModel.getTestByCourseId = (course_id, unit_number, lesson_number) => {
   return pool.query('SELECT test.* FROM test INNER JOIN lesson ON lesson.lesson_id=test.lesson_lesson_id INNER JOIN unit ON unit.unit_id=lesson.unit_unit_id INNER JOIN course ON unit.course_course_id=course.course_id WHERE unit.number=? AND lesson.number=? AND course_id=?;', [unit_number, lesson_number, course_id]);
 }
 
+coursesModel.getTestByLessonId = (lesson_id) => {
+  return pool.query('SELECT test.* FROM test INNER JOIN lesson ON lesson.lesson_id=test.lesson_lesson_id INNER JOIN unit ON unit.unit_id=lesson.unit_unit_id INNER JOIN course ON unit.course_course_id=course.course_id WHERE lesson.lesson_id=?', [lesson_id]);
+}
+
 coursesModel.getQuestionsByTestId = (test_id) => {
   return pool.query('SELECT * FROM question WHERE test_test_id = ?', [test_id]);
 }
@@ -137,9 +141,105 @@ coursesModel.asignCourseToStudent = (asignment) => {
 }
 
 coursesModel.removeStudentFromCourse = (course_id, student_id) => {
-  console.log('data to delete:', course_id, student_id);
-
   return pool.query('DELETE FROM `course_has_student` WHERE (`course_course_id` = ?) and (`student_student_id` = ?);', [course_id, student_id])
+}
+
+coursesModel.createTest = (state, course_id, unit_id, lesson_id, questions, callback) => {
+  pool.getConnection((err, connection) => {
+    connection.beginTransaction(err => {
+      (err) ? console.log(err) : null;
+      pool.query('INSERT INTO test (state, lesson_unit_course_course_id, lesson_unit_unit_id, lesson_lesson_id) VALUES (?)', [[state, course_id, unit_id, lesson_id]], async (newTestErr, newTest) => {
+        if (newTestErr) {
+          connection.rollback(() => {
+            console.log(newTestErr);
+            throw newTestErr;
+          });
+        }
+        console.log({newTest});
+        console.log('largo preguntas:', questions.length);
+        for await (const question of questions) {
+          pool.query('INSERT INTO question (title, type, test_test_id) VALUES (?)', [[question.title, question.type, newTest.insertId]], (newQuestionErr, newQuestion) => {
+            if (newQuestionErr) {
+              connection.rollback(() => {
+                console.log(newQuestionErr);
+                throw newQuestionErr;
+              });
+              console.log({newQuestion});
+            }
+            if (question.type !== 'text') {
+              pool.query('INSERT INTO answer (title, question_question_id) VALUES (?)', [[question.answer_1, newQuestion.insertId]], (newAnswerErr, newAnswer) => {
+                if (newAnswerErr) {
+                  connection.rollback(() => {
+                    console.log('error en answer', newAnswerErr);
+                    throw newAnswerErr;
+                  });
+                }
+              });
+              pool.query('INSERT INTO answer (title, question_question_id) VALUES (?)', [[question.answer_2, newQuestion.insertId]], (newAnswerErr, newAnswer) => {
+                if (newAnswerErr) {
+                  connection.rollback(() => {
+                    console.log('error en answer', newAnswerErr);
+                    throw newAnswerErr;
+                  });
+                }              
+              });
+              pool.query('INSERT INTO answer (title, question_question_id) VALUES (?)', [[question.answer_3, newQuestion.insertId]], (newAnswerErr, newAnswer) => {
+                if (newAnswerErr) {
+                  connection.rollback(() => {
+                    console.log('error en answer', newAnswerErr);
+                    throw newAnswerErr;
+                  });
+                }              
+              });
+              pool.query('INSERT INTO answer (title, question_question_id) VALUES (?)', [[question.answer_4, newQuestion.insertId]], (newAnswerErr, newAnswer) => {
+                if (newAnswerErr) {
+                  connection.rollback(() => {
+                    console.log('error en answer', newAnswerErr);
+                    throw newAnswerErr;
+                  });
+                }              
+              });
+            }
+          });
+          if(question === questions[questions.length - 1]){
+            connection.commit(err => {
+              console.log('Commiting transaction.....')
+              if (err) {
+                  return connection.rollback(() => {
+                      throw err;
+                  })
+              }
+    
+              console.log('Transaction Complete.');
+              callback(null, true);
+            });
+          } 
+        }
+      });
+    });
+    connection.release();
+  });
+  
+  /* pool.query('INSERT INTO test (state, lesson_unit_course_course_id, lesson_unit_unit_id, lesson_lesson_id) VALUES (?)', [[state, course_id, unit_id, lesson_id]])
+    .then(async newTest => {
+      console.log('id nuevo test:', test.insertId);
+      for await (const question of questions) {
+        pool.query('INSERT INTO question (title, type, test_test_id, test_lesson_unit_course_course_id, test_lesson_unit_unit_id, test_lesson_lesson_id) VALUES (?)', [[question.title, type, newTest.insertId, course_id, unit_id, lesson_id]])
+          .then(newQuestion => {
+            pool.query('INSERT INTO answer (title, question_question_id, question_test_test_id, question_test_lesson_unit_course_course_id, question_test_lesson_unit_unit_id, question_test_lesson_lesson_id) VALUES (?)', [[answer_1, question_id, newTest.insertId, course_id, unit_id, lesson_id]]);
+            pool.query('INSERT INTO answer (title, question_question_id, question_test_test_id, question_test_lesson_unit_course_course_id, question_test_lesson_unit_unit_id, question_test_lesson_lesson_id) VALUES (?)', [[answer_2, question_id, newTest.insertId, course_id, unit_id, lesson_id]]);
+            pool.query('INSERT INTO answer (title, question_question_id, question_test_test_id, question_test_lesson_unit_course_course_id, question_test_lesson_unit_unit_id, question_test_lesson_lesson_id) VALUES (?)', [[answer_3, question_id, newTest.insertId, course_id, unit_id, lesson_id]]);
+            pool.query('INSERT INTO answer (title, question_question_id, question_test_test_id, question_test_lesson_unit_course_course_id, question_test_lesson_unit_unit_id, question_test_lesson_lesson_id) VALUES (?)', [[answer_4, question_id, newTest.insertId, course_id, unit_id, lesson_id]]);
+          })
+          .catch(err => {
+            return err
+          });
+      }
+      return 'ok'
+    })
+    .catch(err => {
+      return err
+    }); */
 }
 
 module.exports = coursesModel;
