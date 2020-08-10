@@ -512,6 +512,27 @@ router.delete('/course/:courseId/student/:studentId/remove-student', verifyRole.
     });
 });
 
+// remove course
+router.delete('/course/:courseId/delete', verifyRole.teacher, (req, res) => {
+  let course_id = req.params.courseId
+
+  coursesModel.deleteCourse(course_id)
+    .then(data => {
+      res.status(200).json({
+        success: true,
+        message: "Course deleted successfully"
+      });
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json({
+        success: false,
+        message: "Error on deleteCourse",
+        err: err.sqlMessage
+      });
+    });
+});
+
 // create new test
 router.post('/courses/newTest', verifyRole.teacher, (req, res) => {
   const { state, course_id, unit_id, lesson_id, questions } = req.body;

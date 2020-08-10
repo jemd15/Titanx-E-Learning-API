@@ -144,6 +144,10 @@ coursesModel.removeStudentFromCourse = (course_id, student_id) => {
   return pool.query('DELETE FROM `course_has_student` WHERE (`course_course_id` = ?) and (`student_student_id` = ?);', [course_id, student_id])
 }
 
+coursesModel.deleteCourse = (course_id) => {
+  return pool.query('DELETE FROM `course` WHERE `course_id` = ?;', [course_id])
+}
+
 coursesModel.createTest = (state, course_id, unit_id, lesson_id, questions, callback) => {
   pool.getConnection((err, connection) => {
     connection.beginTransaction(err => {
